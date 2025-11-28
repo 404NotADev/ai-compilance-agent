@@ -1,0 +1,109 @@
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+ENV/
+env/
+.env/
+.env.docker
+.env.local
+.env.example
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# pytest
+.pytest_cache/
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+*.pot
+*.mo
+
+# Migrations (если хочешь пушить — убери)
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# =====================
+# Docker
+# =====================
+*.env
+*.env.docker
+docker-compose.override.yml
+Dockerfile.*
+
+# =====================
+# VSCode / IDEs
+# =====================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# =====================
+# System files
+# =====================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+
+# =====================
+# Logs / temp
+# =====================
+*.log
+*.tmp
+*.temp
+*.cache
+*.out
+
