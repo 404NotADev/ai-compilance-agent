@@ -304,7 +304,7 @@ class ReportCompiler:
         """
         from ..models import AITrigger, RiskDefinition
         
-        # Get all pending triggers for this video
+        # Получить все ожидающие триггеры для этого видео
         db_triggers = AITrigger.objects.filter(
             video=video,
             status=AITrigger.Status.PENDING
@@ -322,24 +322,24 @@ class ReportCompiler:
             trigger_type = db_trigger.get_trigger_source_display()
             source = db_trigger.trigger_source
             
-            # Track by type
+            # Отслеживать по типу
             if trigger_type not in report['triggers_by_type']:
                 report['triggers_by_type'][trigger_type] = 0
             report['triggers_by_type'][trigger_type] += 1
             
-            # Track by source
+            # Отслеживать по источнику
             if source not in report['triggers_by_source']:
                 report['triggers_by_source'][source] = 0
             report['triggers_by_source'][source] += 1
             
-            # Get risk definition metadata
+            # Получить метаданные определения риска
             risk_def = None
             try:
                 risk_def = RiskDefinition.objects.get(trigger_source=source)
             except RiskDefinition.DoesNotExist:
                 pass
             
-            # Build risk entry
+            # Создать запись риска
             risk_entry = {
                 'id': str(db_trigger.id),
                 'timestamp': float(db_trigger.timestamp_sec),
@@ -350,7 +350,7 @@ class ReportCompiler:
                 'data': db_trigger.data,
             }
             
-            # Add risk definition metadata if available
+            # Добавить метаданные определения риска, если доступны
             if risk_def:
                 risk_entry['risk_level'] = risk_def.risk_level
                 risk_entry['risk_name'] = risk_def.name

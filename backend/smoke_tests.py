@@ -192,6 +192,6 @@ if __name__ == '__main__':
     failures = test_runner.run_tests(['smoke_tests'])
     
     if failures:
-        print(f"\n❌ {failures} test(s) failed")
+        print(f"\n {failures} test(s) failed")
     else:
-        print("\n✅ All smoke tests passed!")
+        print("\n All smoke tests passed!")

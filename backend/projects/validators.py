@@ -26,21 +26,21 @@ class VideoValidator:
         """
         errors = []
 
-        # Check file size
+        # Проверить размер файла
         if video.file_size and video.file_size > self.max_file_size:
             errors.append(
                 f"File size {video.file_size} bytes exceeds maximum {self.max_file_size} bytes "
                 f"({self.max_file_size / (1024**3):.2f} GB)"
             )
 
-        # Check duration
+        # Проверить продолжительность
         if video.duration and video.duration > self.max_duration:
             errors.append(
                 f"Video duration {video.duration} seconds exceeds maximum {self.max_duration} seconds "
                 f"({self.max_duration / 3600:.1f} hours)"
             )
 
-        # Check format
+        # Проверить формат
         if video.original_name:
             ext = video.original_name.split('.')[-1].lower()
             if ext not in self.allowed_formats:
@@ -48,7 +48,7 @@ class VideoValidator:
                     f"File format '.{ext}' not allowed. Supported formats: {', '.join(self.allowed_formats)}"
                 )
 
-        # Check file existence for file-based videos
+        # Проверить наличие файла для видео на основе файла
         if video.video_file:
             file_path = video.video_file.path
             if not os.path.exists(file_path):
@@ -70,14 +70,14 @@ class VideoValidator:
         if not os.path.exists(file_path):
             raise VideoValidationError(f"File not found: {file_path}")
 
-        # Check file size
+        # Проверить размер файла
         file_size = os.path.getsize(file_path)
         if file_size > self.max_file_size:
             raise VideoValidationError(
                 f"File size {file_size} bytes exceeds maximum {self.max_file_size} bytes"
             )
 
-        # Check file format
+        # Проверить формат файла
         ext = file_path.split('.')[-1].lower()
         if ext not in self.allowed_formats:
             raise VideoValidationError(f"File format '.{ext}' not allowed")
@@ -100,7 +100,7 @@ def notify_validation_failure(video, error_message):
             )
             recipient = admin_email
 
-        subject = f"❌ Ошибка валидации видео: {video.original_name}"
+        subject = f" Ошибка валидации видео: {video.original_name}"
         message = (
             f"Видео '{video.original_name}' не прошло валидацию и не может быть обработано.\n\n"
             f"Ошибка: {error_message}\n\n"

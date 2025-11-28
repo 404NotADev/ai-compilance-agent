@@ -90,7 +90,7 @@ def process_video(self, video_id):
         with transaction.atomic():
             video = Video.objects.get(id=video_id)
             
-            # Create or get execution record
+            # Создать или получить запись выполнения
             execution, created = PipelineExecution.objects.get_or_create(
                 video=video,
                 defaults={
@@ -100,7 +100,7 @@ def process_video(self, video_id):
                 }
             )
             
-            # Validate video before starting pipeline
+            # Проверить видео перед запуском конвейера
             try:
                 validator = VideoValidator()
                 validator.validate_video(video)
@@ -131,11 +131,11 @@ def process_video(self, video_id):
             video.status = VideoStatus.PROCESSING
             video.save()
 
-        # Resume from last successful step if retrying
+        # Продолжить с последнего успешного шага при повторной попытке
         if execution.last_step:
             logger.info(f"Resuming pipeline from step: {execution.last_step}")
 
-        # Chain: preprocess -> group(audio_branch, frames_branch) -> compile_report
+        # Цепочка: предварительная обработка → группировка (audio_branch, frames_branch) → составление отчёта
         workflow = chain(
             preprocess_video.s(video_id),
             group([
@@ -182,7 +182,7 @@ def preprocess_video(self, video_id):
         video = Video.objects.get(id=video_id)
         preprocessor = VideoPreprocessor()
         
-        # Get video path
+        # Получить путь к видео
         if video.video_url and not video.video_file:
             video_path = preprocessor.download_from_url(video.video_url)
         else:
@@ -300,17 +300,17 @@ def run_video_analytics(self, frames_dir, video_id):
         
         analytics_service = VideoAnalyticsService()
         
-        # Process frames
+        # Обработать кадры
         frame_files = [f for f in os.listdir(frames_dir) if f.endswith('.jpg')]
         frame_results = []
         execution = PipelineExecution.objects.get(video_id=video_id)
         
-        for i, frame_file in enumerate(frame_files[:5]):  # Process first 5 frames
+        for i, frame_file in enumerate(frame_files[:5]):  # Обработать первые 5 кадров
             frame_path = os.path.join(frames_dir, frame_file)
             result = analytics_service.analyze_frame(frame_path, i)
             frame_results.append(result)
             
-            # Update API call counters
+            # Обновить счётчики вызовов API
             execution.api_calls_count += 2  # YOLO + NSFW
             execution.cost_estimate += 0.0002
             execution.save()
@@ -378,26 +378,26 @@ def compile_report(self, results, video_id):
             video = Video.objects.get(id=video_id)
             compiler = ReportCompiler()
             
-            # results contains [nlp_results, video_results]
+            # results содержит [nlp_results, video_results]
             nlp_results, video_results = results
             all_triggers = nlp_results + video_results
             
-            # Save triggers to DB
+            # Сохранить триггеры в базу данных
             compiler.save_triggers_to_db(video, all_triggers)
             
-            # Build report from DB data only (filter by status)
+            # Сформировать отчёт только из данных базы данных (фильтровать по статусу)
             final_report = compiler.compile_final_report_from_db(video)
             
-            # Update video
+            # Обновить видео
             video.ai_report = final_report
             video.status = VideoStatus.VERIFICATION
             video.processed_at = timezone.now()
             video.save()
             
-            # Create verification task for operator
+            # Создать задачу верификации для оператора
             VerificationTask.objects.get_or_create(video=video)
             
-            # Complete pipeline execution
+            # Завершить выполнение конвейера
             execution.status = PipelineExecution.Status.COMPLETED
             execution.progress = 100
             execution.completed_at = timezone.now()
@@ -406,7 +406,7 @@ def compile_report(self, results, video_id):
             )
             execution.save()
         
-        # Send success notification
+        # Отправить уведомление об успешном выполнении
         from projects.tasks import send_video_ready_notification
         send_video_ready_notification.delay(str(video_id))
         
@@ -444,7 +444,7 @@ def handle_pipeline_error(video_id, stage, error_message):
             execution.retry_count += 1
             execution.save()
         
-        # Send failure notification to admins
+        # Отправить уведомление о сбое администраторам
         from projects.tasks import send_pipeline_failure_notification
         send_pipeline_failure_notification.delay(str(video_id), stage, error_message)
         
@@ -466,7 +466,7 @@ def cleanup_artifacts_periodic():
         
         b2_utils = get_b2_utils()
         
-        # Find completed or failed executions older than 7 days
+        # Найти выполненные или завершившиеся с ошибкой запуски старше 7 дней
         from django.utils import timezone
         from datetime import timedelta
         
@@ -481,8 +481,8 @@ def cleanup_artifacts_periodic():
         
         deleted_count = 0
         for execution in old_executions:
-            # TODO: Implement logic to identify and delete temp files
-            # This depends on your naming scheme for temp files in B2
+            # TODO: Реализовать логику для идентификации и удаления временных файлов
+            # Это зависит от вашей схемы именования временных файлов в B2
             pass
         
         logger.info(f"Artifact cleanup completed, deleted {deleted_count} artifacts")
@@ -503,8 +503,8 @@ def refresh_cdn_cache_periodic():
         logger.info("Starting periodic CDN cache refresh")
         log_pipeline_step(None, 'refresh_cdn_cache_periodic', 'started')
         
-        # TODO: Implement Cloudflare cache purge logic
-        # This depends on your Cloudflare API setup
+        # TODO: Реализовать логику очистки кеша Cloudflare
+        # Это зависит от вашей настройки API Cloudflare
         
         logger.info("CDN cache refresh completed")
         log_pipeline_step(None, 'refresh_cdn_cache_periodic', 'completed')

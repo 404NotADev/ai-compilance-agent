@@ -1,6 +1,6 @@
 """
-Tests for resilient pipeline and storage features.
-Tests for idempotent resume, B2 retry logic, error handling, and notifications.
+Тесты для устойчивого конвейера и функций хранения.
+Тесты для идемпотентного возобновления, логики повторной попытки в B2, обработки ошибок и уведомлений.
 """
 import json
 import uuid
@@ -19,7 +19,7 @@ from storage.b2_utils import B2Utils, B2RetryableError
 
 
 class VideoValidationTests(TestCase):
-    """Tests for video validation before pipeline starts."""
+    """Тесты для проверки видео перед запуском конвейера."""
 
     def setUp(self):
         self.user = User.objects.create_user(
@@ -35,15 +35,15 @@ class VideoValidationTests(TestCase):
         self.validator = VideoValidator()
 
     def test_validate_video_success(self):
-        """Test that validation passes for valid video."""
+        """Проверить, что валидация проходит для корректного видео."""
         video = Video.objects.create(
             project=self.project,
             original_name='test.mp4',
             file_size=1024 * 1024 * 500,  # 500MB
-            duration=3600,  # 1 hour
+            duration=3600,  # 1 час
         )
         
-        # Should not raise
+        # Не должно вызывать (исключений)
         result = self.validator.validate_video(video)
         self.assertTrue(result)
 
@@ -52,7 +52,7 @@ class VideoValidationTests(TestCase):
         video = Video.objects.create(
             project=self.project,
             original_name='test.mp4',
-            file_size=3 * 1024 * 1024 * 1024,  # 3GB, exceeds 2GB default
+            file_size=3 * 1024 * 1024 * 1024,  # 3 ГБ, превышает значение по умолчанию 2 ГБ
             duration=3600,
         )
         
@@ -67,7 +67,7 @@ class VideoValidationTests(TestCase):
             project=self.project,
             original_name='test.mp4',
             file_size=1024 * 1024 * 500,
-            duration=10000,  # ~2.8 hours, exceeds 2 hour default
+            duration=10000,  # ~2,8 часа, превышает значение по умолчанию 2 часа
         )
         
         with self.assertRaises(VideoValidationError) as context:
@@ -126,15 +126,15 @@ class B2UtilsRetryTests(TestCase):
         
         b2_utils = B2Utils()
         
-        # First call should generate URL
+        # Первый вызов должен сгенерировать URL
         url1 = b2_utils.generate_signed_url('videos/test.mp4')
         self.assertEqual(url1, 'https://signed.example.com/video.mp4')
         
-        # Second call should use cache
+        # Второй вызов должен использовать кеш
         url2 = b2_utils.generate_signed_url('videos/test.mp4')
         self.assertEqual(url2, 'https://signed.example.com/video.mp4')
         
-        # Service should only be called once
+        # Сервис должен вызываться только один раз
         self.assertEqual(mock_service.generate_presigned_url.call_count, 1)
 
 
@@ -167,13 +167,13 @@ class PipelineResilienceTests(TransactionTestCase):
             started_at=timezone.now(),
         )
         
-        # Simulate progress update
+        # Симулировать обновление прогресса
         execution.current_task = 'preprocess_video'
         execution.progress = 10
         execution.last_step = 'preprocess_video'
         execution.save()
         
-        # Verify state
+        # Проверить состояние
         execution.refresh_from_db()
         self.assertEqual(execution.current_task, 'preprocess_video')
         self.assertEqual(execution.progress, 10)
@@ -187,7 +187,7 @@ class PipelineResilienceTests(TransactionTestCase):
             error_trace=[],
         )
         
-        # Simulate error
+        # Симулировать ошибку
         error_entry = {
             'timestamp': timezone.now().isoformat(),
             'step': 'run_whisper_asr',
@@ -196,7 +196,7 @@ class PipelineResilienceTests(TransactionTestCase):
         execution.error_trace.append(error_entry)
         execution.save()
         
-        # Verify error was recorded
+        # Проверить, что ошибка была зафиксирована
         execution.refresh_from_db()
         self.assertEqual(len(execution.error_trace), 1)
         self.assertEqual(execution.error_trace[0]['step'], 'run_whisper_asr')
@@ -210,13 +210,13 @@ class PipelineResilienceTests(TransactionTestCase):
             error_message='Video analytics failed',
         )
         
-        # Simulate retry
+        # Симулировать повторную попытку
         execution.status = PipelineExecution.Status.RUNNING
         execution.retry_count += 1
-        execution.progress = 50  # Resume from run_video_analytics
+        execution.progress = 50  # Продолжить с run_video_analytics
         execution.save()
         
-        # Verify resume state
+        # Проверить состояние возобновления
         execution.refresh_from_db()
         self.assertEqual(execution.retry_count, 1)
         self.assertEqual(execution.last_step, 'run_ffmpeg_frames')
@@ -249,11 +249,11 @@ class PipelineErrorHandlingTests(TransactionTestCase):
         """Test that failure notifications are sent to admins."""
         from projects.tasks import send_pipeline_failure_notification
         
-        # Call the notification task
+        # Вызвать задачу уведомления
         with patch('projects.tasks.settings.ADMIN_EMAIL', 'admin@example.com'):
             send_pipeline_failure_notification(str(self.video.id), 'whisper_asr', 'API timeout')
         
-        # Verify email was sent
+        # Проверить, что письмо было отправлено
         mock_send_mail.assert_called_once()
         call_args = mock_send_mail.call_args
         self.assertIn('admin@example.com', call_args[1]['recipient_list'])
@@ -267,7 +267,7 @@ class PipelineErrorHandlingTests(TransactionTestCase):
         error_msg = "File size exceeds maximum"
         notify_validation_failure(self.video, error_msg)
         
-        # Verify email was sent
+        # Проверить, что электронное письмо отправлено
         mock_send_mail.assert_called_once()
         call_args = mock_send_mail.call_args
         self.assertIn(self.user.email, call_args[1]['recipient_list'])
@@ -299,7 +299,7 @@ class ReportCompilerTests(TestCase):
         """Test that report compilation only includes PENDING triggers."""
         from ai_pipeline.services.ai_services import ReportCompiler
         
-        # Create triggers with different statuses
+        # Создать триггеры с разными статусами
         pending_trigger = AITrigger.objects.create(
             video=self.video,
             timestamp_sec=Decimal('10.5'),
@@ -318,11 +318,11 @@ class ReportCompilerTests(TestCase):
             status=AITrigger.Status.PROCESSED,
         )
         
-        # Compile report
+        # Составить отчёт
         compiler = ReportCompiler()
         report = compiler.compile_final_report_from_db(self.video)
         
-        # Should only include pending trigger
+        # Должен включать только ожидающий триггер
         self.assertEqual(report['total_triggers'], 1)
         self.assertEqual(len(report['risks']), 1)
         self.assertEqual(report['risks'][0]['source'], 'whisper_profanity')
@@ -332,7 +332,7 @@ class ReportCompilerTests(TestCase):
         from ai_pipeline.models import RiskDefinition
         from ai_pipeline.services.ai_services import ReportCompiler
         
-        # Create risk definition
+        # Создать определение риска
         risk_def = RiskDefinition.objects.create(
             trigger_source=AITrigger.TriggerSource.FALCONSAI_NSFW,
             name='NSFW Content',
@@ -340,7 +340,7 @@ class ReportCompilerTests(TestCase):
             risk_level='high',
         )
         
-        # Create trigger
+        # Создать триггер
         AITrigger.objects.create(
             video=self.video,
             timestamp_sec=Decimal('15.0'),
@@ -350,11 +350,11 @@ class ReportCompilerTests(TestCase):
             status=AITrigger.Status.PENDING,
         )
         
-        # Compile report
+        # Составить отчёт
         compiler = ReportCompiler()
         report = compiler.compile_final_report_from_db(self.video)
         
-        # Verify risk definition metadata is included
+        # Проверить, что метаданные определения риска включены
         self.assertEqual(len(report['risks']), 1)
         risk = report['risks'][0]
         self.assertEqual(risk['risk_level'], 'high')
@@ -372,11 +372,11 @@ class StructuredLoggingTests(TestCase):
             video_id = uuid.uuid4()
             log_pipeline_step(video_id, 'preprocess_video', 'completed')
             
-            # Verify logger was called with JSON
+            # Проверить, что логгер был вызван с JSON
             mock_logger.info.assert_called_once()
             log_call_arg = mock_logger.info.call_args[0][0]
             
-            # Should be valid JSON
+            # Должен быть корректным JSON
             log_data = json.loads(log_call_arg)
             self.assertEqual(log_data['step'], 'preprocess_video')
             self.assertEqual(log_data['status'], 'completed')

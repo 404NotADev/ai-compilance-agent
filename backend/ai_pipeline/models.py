@@ -166,7 +166,7 @@ class VerificationTask(models.Model):
     completed_at = models.DateTimeField(_('время завершения'), null=True, blank=True)
     total_processing_time = models.IntegerField(_('общее время обработки (сек)'), default=0)
     
-    # Task locking fields
+    # Поля блокировки задачи
     expires_at = models.DateTimeField(_('истекает в'), null=True, blank=True, help_text=_('Время, когда блокировка задачи истекает'))
     last_heartbeat = models.DateTimeField(_('последний heartbeat'), null=True, blank=True, help_text=_('Последнее обновление активности оператора'))
     decision_summary = models.TextField(_('суммарное решение'), blank=True, help_text=_('Итоговое описание принятых решений'))

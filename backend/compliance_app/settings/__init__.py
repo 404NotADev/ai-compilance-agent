@@ -19,7 +19,7 @@ To use production settings:
 
 import os
 
-# Determine which settings module to use
+# Определить, какой модуль настроек использовать
 django_env = os.environ.get('DJANGO_ENV', 'production').lower()
 
 if django_env in ('dev', 'development', 'local'):
@@ -27,5 +27,5 @@ if django_env in ('dev', 'development', 'local'):
 elif django_env in ('prod', 'production'):
     from .prod import *
 else:
-    # Default to production for safety
+    # По умолчанию использовать production для безопасности
     from .prod import *

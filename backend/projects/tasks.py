@@ -20,7 +20,7 @@ def send_video_ready_notification(video_id):
             logger.warning("No recipient email for video %s (project owner missing or has no email)", video_id)
             return False
 
-        subject = f"✅ Отчет по видео готов: {video.original_name}"
+        subject = f" Отчет по видео готов: {video.original_name}"
         
         # Build HTML email
         context = {
@@ -81,7 +81,7 @@ def send_pipeline_failure_notification(video_id, stage, error_message):
             logger.warning("No recipient emails for pipeline failure notification")
             return False
 
-        subject = f"❌ Ошибка обработки видео: {video.original_name} ({stage})"
+        subject = f" Ошибка обработки видео: {video.original_name} ({stage})"
         
         message = (
             f"Видео '{video.original_name}' не удалось обработать.\n\n"

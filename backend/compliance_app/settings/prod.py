@@ -7,25 +7,25 @@ All sensitive data should come from environment variables.
 
 from .base import *
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: не запускайте с включённым debug в production!
 DEBUG = env.bool('DEBUG', default=False)
 
-# SECURITY: Allowed hosts must be set in production
+# БЕЗОПАСНОСТЬ: в production должны быть заданы разрешённые хосты (Allowed hosts)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 if not ALLOWED_HOSTS:
     raise ValueError("ALLOWED_HOSTS must be set in production environment")
 
-# Database - PostgreSQL required in production
+# База данных — в production требуется PostgreSQL
 DATABASES = {
     'default': env.db('DATABASE_URL')
 }
 
-# Validate that PostgreSQL is being used
+# Проверить, что используется PostgreSQL
 if not DATABASES['default']['ENGINE'].endswith('postgresql'):
     raise ValueError("PostgreSQL is required in production. Set DATABASE_URL to postgres://...")
 
-# Email Configuration - SMTP required in production
+# Конфигурация электронной почты — в production требуется SMTP
 EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_PORT = env.int('EMAIL_PORT', default=587)
@@ -35,7 +35,7 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 ADMIN_EMAIL = env('ADMIN_EMAIL', default='admin@localhost')
 
-# Security Settings for Production
+# Настройки безопасности для production
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=True)
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE', default=True)
@@ -55,7 +55,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Strict'
 SESSION_COOKIE_AGE = 1209600  # 2 weeks
 
-# Validate critical environment variables
+# Проверить критически важные переменные окружения
 if not SECRET_KEY or SECRET_KEY == 'unsafe-secret-key':
     raise ValueError("SECRET_KEY must be set to a secure value in production")
 
@@ -74,10 +74,10 @@ if not BACKBLAZE_CONFIG['APPLICATION_KEY']:
 if not BACKBLAZE_CONFIG['BUCKET_NAME']:
     raise ValueError("BACKBLAZE_BUCKET_NAME must be set in production")
 
-# Static files handling with WhiteNoise
+# Обработка статических файлов с помощью WhiteNoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Logging for production - structured output
+# Логирование для production — структурированный вывод
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

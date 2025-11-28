@@ -10,16 +10,16 @@ import environ
 from pathlib import Path
 from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Строить пути внутри проекта так: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR.parent, '.env'))
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: держите секретный ключ, используемый в production, в секрете!
 SECRET_KEY = env('SECRET_KEY', default='unsafe-secret-key')
 
-# Application definition
+# Определение приложения
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -75,7 +75,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'compliance_app.wsgi.application'
 
-# Password validation
+# Проверка пароля
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -91,24 +91,24 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
+# Интернационализация
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Статические файлы (CSS, JavaScript, изображения)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Default primary key field type
+# Тип поля первичного ключа по умолчанию
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom user model
+# Пользовательская модель пользователя
 AUTH_USER_MODEL = 'users.User'
 
-# Celery Configuration
+# Конфигурация Celery
 CELERY_BROKER_URL = env('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_TASK_SERIALIZER = 'json'
@@ -125,7 +125,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_MAX_TASKS_PER_CHILD = env.int('CELERY_WORKER_MAX_TASKS_PER_CHILD', default=100)
 
-# Backblaze B2 Configuration
+# Конфигурация Backblaze B2
 BACKBLAZE_CONFIG = {
     'ENDPOINT_URL': env('BACKBLAZE_ENDPOINT_URL', default=''),
     'APPLICATION_KEY_ID': env('BACKBLAZE_APPLICATION_KEY_ID', default=''),
@@ -134,15 +134,15 @@ BACKBLAZE_CONFIG = {
     'CLOUDFLARE_CDN_URL': env('CLOUDFLARE_CDN_URL', default=''),
 }
 
-# B2 Retry settings
+# Настройки повторных попыток B2
 B2_MAX_RETRIES = env.int('B2_MAX_RETRIES', default=3)
 B2_RETRY_BACKOFF = env.int('B2_RETRY_BACKOFF', default=2)
 B2_RETRY_BACKOFF_MAX = env.int('B2_RETRY_BACKOFF_MAX', default=60)
 
-# Replicate AI Services
+# Реплицировать AI-сервисы
 REPLICATE_API_TOKEN = env('REPLICATE_API_TOKEN', default='')
 
-# AI Model IDs (Replicate)
+# ID моделей ИИ (Replicate)
 WHISPER_MODEL_ID = env(
     'WHISPER_MODEL_ID', 
     default="openai/whisper:4d50797290df275329f202e48c76360b3f22b08d28c196cbc54600319435f8d2"
@@ -164,29 +164,29 @@ OCR_MODEL_ID = env(
     default="abiruyt/text-extract-ocr:3e6e3e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e"
 )
 
-# Replicate settings
+# Настройки Replicate
 REPLICATE_TIMEOUT = env.int('REPLICATE_TIMEOUT', default=300)
 
-# Cloudflare (additional settings)
+# Cloudflare (дополнительные настройки)
 CLOUDFLARE_API_TOKEN = env('CLOUDFLARE_API_TOKEN', default='')
 CLOUDFLARE_ZONE_ID = env('CLOUDFLARE_ZONE_ID', default='')
 
-# AI Pipeline Settings
+# Настройки конвейера ИИ
 MAX_VIDEO_FILE_SIZE = env.int('MAX_VIDEO_FILE_SIZE', default=2147483648)  # 2GB
 MAX_VIDEO_DURATION = env.int('MAX_VIDEO_DURATION', default=7200)  # 2 hours
 FRAME_EXTRACTION_FPS = env.int('FRAME_EXTRACTION_FPS', default=1)
 ALLOWED_VIDEO_FORMATS = env.list('ALLOWED_VIDEO_FORMATS', default=['mp4', 'avi', 'mov', 'mkv', 'webm'])
 DASHBOARD_URL = env('DASHBOARD_URL', default='https://app.example.com')
 
-# NLP Dictionaries (optional)
+# Словари NLP (необязательно)
 PROFANITY_DICT_PATH = env('PROFANITY_DICT_PATH', default='')
 BRAND_DICT_PATH = env('BRAND_DICT_PATH', default='')
 STOPWORDS_DICT_PATH = env('STOPWORDS_DICT_PATH', default='')
 
-# Temporary Directory
+# Временная директория
 TEMP_DIR = env('TEMP_DIR', default='/tmp')
 
-# Logging Configuration
+# Конфигурация логирования
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

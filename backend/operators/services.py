@@ -117,7 +117,7 @@ class LabelingService:
             comment=comment
         )
 
-        # conditionally include end_time_sec if field exists on model
+        # Условно включать end_time_sec, если такое поле существует в модели
         try:
             OperatorLabel._meta.get_field('end_time_sec')
             create_kwargs['end_time_sec'] = end_time_sec
